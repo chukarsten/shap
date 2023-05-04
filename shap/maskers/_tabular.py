@@ -99,7 +99,7 @@ class Tabular(Masker):
         if np.issubdtype(mask.dtype, np.integer):
 
             variants = ~self.invariants(x)
-            curr_delta_inds = np.zeros(len(mask), dtype=np.int)
+            curr_delta_inds = np.zeros(len(mask), dtype=int)
             num_masks = (mask >= 0).sum()
             varying_rows_out = np.zeros((num_masks, self.shape[0]), dtype=bool)
             masked_inputs_out = np.zeros((num_masks * self.shape[0], self.shape[1]))
