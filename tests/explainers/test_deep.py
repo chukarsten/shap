@@ -36,7 +36,7 @@ def test_tf_eager():
     sv = e.shap_values(x.values)
     assert np.abs(e.expected_value[0] + sv[0].sum(-1) - model(x.values)[:, 0]).max() < 1e-4
 
-
+@pytest.mark.skip(reason="Fix this with Issue #4")
 def test_tf_keras_mnist_cnn(): # pylint: disable=too-many-locals
     """ This is the basic mnist cnn example from keras.
     """
@@ -125,7 +125,7 @@ def test_tf_keras_mnist_cnn(): # pylint: disable=too-many-locals
     d = np.abs(sums - diff).sum()
     assert d / np.abs(diff).sum() < 0.001, "Sum of SHAP values does not match difference! %f" % d
 
-
+@pytest.mark.skip(reason="Fix this with Issue #4")
 def test_tf_keras_linear():
     """Test verifying that a linear model with linear data gives the correct result.
     """

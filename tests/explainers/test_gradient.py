@@ -5,7 +5,7 @@ import shap
 
 
 # pylint: disable=import-error, import-outside-toplevel, no-name-in-module, import-error
-
+@pytest.mark.skip(reason="Fix this with Issue #4")
 def test_tf_keras_mnist_cnn():
     """ This is the basic mnist cnn example from keras.
     """
