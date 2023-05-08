@@ -452,11 +452,10 @@ def test_pytorch_single_output():
     from torch import nn
     from torch.nn import functional as F
     from torch.utils.data import TensorDataset, DataLoader
-    from sklearn.datasets import load_boston
 
-    X, y = load_boston(return_X_y=True)
+    X, y = shap.datasets.california(n_points=500)
     num_features = X.shape[1]
-    data = TensorDataset(torch.tensor(X).float(),
+    data = TensorDataset(torch.tensor(X.values).float(),
                          torch.tensor(y).float())
     loader = DataLoader(data, batch_size=128)
 
@@ -469,7 +468,7 @@ def test_pytorch_single_output():
             self.conv1d = nn.Conv1d(1, 1, 1)
             self.convt1d = nn.ConvTranspose1d(1, 1, 1)
             self.leaky_relu = nn.LeakyReLU()
-            self.aapool1d = nn.AdaptiveAvgPool1d(output_size=6)
+            self.aapool1d = nn.AdaptiveAvgPool1d(output_size=4)
             self.maxpool2 = nn.MaxPool1d(kernel_size=2)
 
         def forward(self, X):
