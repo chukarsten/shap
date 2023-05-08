@@ -789,6 +789,7 @@ def test_multi_target_extra_trees():
     assert np.allclose(phi.sum(1), predicted.flatten(order="F"), atol=1e-4)
 
 
+# @pytest.mark.skip(reason="Let's fix this with Issue #7")
 def test_provided_background_tree_path_dependent():
     xgboost = pytest.importorskip("xgboost")
     np.random.seed(10)
