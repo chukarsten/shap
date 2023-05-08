@@ -102,7 +102,7 @@ def test_tf_keras_mnist_cnn(): # pylint: disable=too-many-locals
     model.add(Activation('softmax'))
 
     model.compile(loss=keras.losses.categorical_crossentropy,
-                  optimizer=keras.optimizers.Adadelta(),
+                  optimizer=keras.optimizers.Adam(),
                   metrics=['accuracy'])
 
     model.fit(x_train[:10, :], y_train[:10, :],
