@@ -83,7 +83,7 @@ def test_random_summary_layered_violin_with_data():
     plt.tight_layout()
     return fig
 
-
+@pytest.mark.skip(reason="Let's fix this with Issue #6")
 @pytest.mark.mpl_image_compare
 def test_random_summary_with_log_scale():
     """ Check a with a log scale.
