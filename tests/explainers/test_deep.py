@@ -352,14 +352,12 @@ def test_pytorch_custom_nested_models():
     from torch import nn
     from torch.nn import functional as F
     from torch.utils.data import TensorDataset, DataLoader
-    from sklearn.datasets import load_boston
 
-    X, y = load_boston(return_X_y=True)
+    X, y = shap.datasets.california(n_points=500)
     num_features = X.shape[1]
-    data = TensorDataset(torch.tensor(X).float(),
+    data = TensorDataset(torch.tensor(X.values).float(),
                          torch.tensor(y).float())
     loader = DataLoader(data, batch_size=128)
-
     class CustomNet1(nn.Module):
         """ Model 1.
         """
@@ -370,7 +368,7 @@ def test_pytorch_custom_nested_models():
                     nn.Conv1d(1, 1, 1),
                     nn.ConvTranspose1d(1, 1, 1),
                 ),
-                nn.AdaptiveAvgPool1d(output_size=6),
+                nn.AdaptiveAvgPool1d(output_size=4),
             )
 
         def forward(self, X):
