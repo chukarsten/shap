@@ -525,14 +525,13 @@ def test_pytorch_multiple_inputs():
         from torch import nn
         from torch.nn import functional as F
         from torch.utils.data import TensorDataset, DataLoader
-        from sklearn.datasets import load_boston
         torch.manual_seed(1)
-        X, y = load_boston(return_X_y=True)
+        X, y = shap.datasets.california(n_points=500)
         num_features = X.shape[1]
-        x1 = X[:, num_features // 2:]
-        x2 = X[:, :num_features // 2]
-        data = TensorDataset(torch.tensor(x1).float(),
-                             torch.tensor(x2).float(),
+        x1 = X.iloc[:, num_features // 2:]
+        x2 = X.iloc[:, :num_features // 2]
+        data = TensorDataset(torch.tensor(x1.values).float(),
+                             torch.tensor(x2.values).float(),
                              torch.tensor(y).float())
         loader = DataLoader(data, batch_size=128)
 
@@ -543,7 +542,7 @@ def test_pytorch_multiple_inputs():
                 super().__init__()
                 self.disconnected = disconnected
                 if disconnected:
-                    num_features = num_features // 2 + 1
+                    num_features = num_features // 2
                 self.linear = nn.Linear(num_features, 2)
                 self.output = nn.Sequential(
                     nn.MaxPool1d(2),
