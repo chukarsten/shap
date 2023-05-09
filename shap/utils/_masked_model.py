@@ -59,7 +59,7 @@ class MaskedModel():
             # we need to convert from delta masking to a full masking call because we were given a delta masking
             # input but the masker does not support delta masking
             else: 
-                full_masks = np.zeros((int(np.sum(masks >= 0)), self._masker_cols), dtype=np.bool)
+                full_masks = np.zeros((int(np.sum(masks >= 0)), self._masker_cols), dtype=bool)
                 _convert_delta_mask_to_full(masks, full_masks)
                 return self._full_masking_call(full_masks, zero_index=zero_index, batch_size=batch_size)
 
@@ -71,17 +71,17 @@ class MaskedModel():
         if batch_size is None:
             batch_size = len(masks)
         do_delta_masking = getattr(self.masker, "reset_delta_masking", None) is not None
-        num_varying_rows = np.zeros(len(masks), dtype=np.int)
-        batch_positions = np.zeros(len(masks)+1, dtype=np.int)
+        num_varying_rows = np.zeros(len(masks), dtype=int)
+        batch_positions = np.zeros(len(masks)+1, dtype=int)
         varying_rows = []
         if self._variants is not None:
-            delta_tmp = self._variants.copy().astype(np.int)
+            delta_tmp = self._variants.copy().astype(int)
         all_outputs = []
         for batch_ind in range(0, len(masks), batch_size):
             mask_batch = masks[batch_ind:batch_ind + batch_size]
             all_masked_inputs = []
-            num_mask_samples = np.zeros(len(mask_batch), dtype=np.int)
-            last_mask = np.zeros(mask_batch.shape[1], dtype=np.bool)
+            num_mask_samples = np.zeros(len(mask_batch), dtype=int)
+            last_mask = np.zeros(mask_batch.shape[1], dtype=bool)
             for i, mask in enumerate(mask_batch):
 
                 # mask the inputs
@@ -92,7 +92,7 @@ class MaskedModel():
                 else:
                     masked_inputs = self.masker(mask, *self.args)
 
-                # get a copy that won't get overwritten by the next iteration 
+                # get a copy that won't get overwritten by the next iteration
                 if not getattr(self.masker, "immutable_outputs", False):
                     masked_inputs = copy.deepcopy(masked_inputs)
 
@@ -105,7 +105,7 @@ class MaskedModel():
 
                 # see which rows have been updated, so we can only evaluate the model on the rows we need to
                 if i == 0 or self._variants is None:
-                    varying_rows.append(np.ones(num_mask_samples[i], dtype=np.bool))
+                    varying_rows.append(np.ones(num_mask_samples[i], dtype=bool))
                     num_varying_rows[batch_ind + i] = num_mask_samples[i]
                 else:
                     # a = np.any(self._variants & delta_mask, axis=1)
@@ -195,7 +195,7 @@ class MaskedModel():
 
         subset_masked_inputs = [arg[varying_rows.reshape(-1)] for arg in masked_inputs]
 
-        batch_positions = np.zeros(len(varying_rows)+1, dtype=np.int)
+        batch_positions = np.zeros(len(varying_rows)+1, dtype=int)
         for i in range(len(varying_rows)):
             batch_positions[i+1] = batch_positions[i] + num_varying_rows[i]
 
@@ -244,7 +244,7 @@ class MaskedModel():
             inds = np.arange(len(self))
 
         # mask each potentially nonzero input in isolation
-        masks = np.zeros(2*len(inds), dtype=np.int)
+        masks = np.zeros(2*len(inds), dtype=int)
         masks[0] = MaskedModel.delta_mask_noop_value
         last_ind = -1
         for i in range(len(inds)):
@@ -410,15 +410,15 @@ def make_masks(cluster_matrix):
     """
 
     M = cluster_matrix.shape[0] + 1
-    indices_row_pos = np.zeros(2 * M - 1, dtype=np.int)
-    indptr = np.zeros(2 * M, dtype=np.int)
-    indices = np.zeros(int(np.sum(cluster_matrix[:,3])) + M, dtype=np.int)
+    indices_row_pos = np.zeros(2 * M - 1, dtype=int)
+    indptr = np.zeros(2 * M, dtype=int)
+    indices = np.zeros(int(np.sum(cluster_matrix[:,3])) + M, dtype=int)
 
     # build an array of index lists in CSR format
     _init_masks(cluster_matrix, M, indices_row_pos, indptr)
-    _rec_fill_masks(cluster_matrix, indices_row_pos, indptr, indices, M, cluster_matrix.shape[0] - 1 + M)    
+    _rec_fill_masks(cluster_matrix, indices_row_pos, indptr, indices, M, cluster_matrix.shape[0] - 1 + M)
     mask_matrix = scipy.sparse.csr_matrix(
-        (np.ones(len(indices), dtype=np.bool), indices, indptr),
+        (np.ones(len(indices), dtype=bool), indices, indptr),
         shape=(2 * M - 1, M)
     )
 
@@ -465,14 +465,14 @@ def link_reweighting(p, link):
     expected value. Note that there are many possible reweightings that can satisfy the above
     property. This function returns the one that has the lowest L2 norm.
     """
-    
+
     # the linearized link funciton is a first order Taylor expansion of the link function
     # centered at the expected value
     expected_value = np.mean(p, axis=0)
     epsilon = 0.0001
     link_gradient = (link(expected_value + epsilon) - link(expected_value)) / epsilon
     linearized_link = link_gradient*(p - expected_value) + link(expected_value)
-    
+
     weights = (linearized_link - link(expected_value)) / (link(p) - link(expected_value))
     weights *= weights.shape[0] / np.sum(weights, axis=0)
     return weights

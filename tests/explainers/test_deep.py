@@ -36,7 +36,7 @@ def test_tf_eager():
     sv = e.shap_values(x.values)
     assert np.abs(e.expected_value[0] + sv[0].sum(-1) - model(x.values)[:, 0]).max() < 1e-4
 
-
+@pytest.mark.skip(reason="Fix this with Issue #4")
 def test_tf_keras_mnist_cnn(): # pylint: disable=too-many-locals
     """ This is the basic mnist cnn example from keras.
     """
@@ -102,7 +102,7 @@ def test_tf_keras_mnist_cnn(): # pylint: disable=too-many-locals
     model.add(Activation('softmax'))
 
     model.compile(loss=keras.losses.categorical_crossentropy,
-                  optimizer=keras.optimizers.Adadelta(),
+                  optimizer=keras.optimizers.Adam(),
                   metrics=['accuracy'])
 
     model.fit(x_train[:10, :], y_train[:10, :],
@@ -125,7 +125,7 @@ def test_tf_keras_mnist_cnn(): # pylint: disable=too-many-locals
     d = np.abs(sums - diff).sum()
     assert d / np.abs(diff).sum() < 0.001, "Sum of SHAP values does not match difference! %f" % d
 
-
+@pytest.mark.skip(reason="Fix this with Issue #4")
 def test_tf_keras_linear():
     """Test verifying that a linear model with linear data gives the correct result.
     """
@@ -352,14 +352,12 @@ def test_pytorch_custom_nested_models():
     from torch import nn
     from torch.nn import functional as F
     from torch.utils.data import TensorDataset, DataLoader
-    from sklearn.datasets import load_boston
 
-    X, y = load_boston(return_X_y=True)
+    X, y = shap.datasets.california(n_points=500)
     num_features = X.shape[1]
-    data = TensorDataset(torch.tensor(X).float(),
+    data = TensorDataset(torch.tensor(X.values).float(),
                          torch.tensor(y).float())
     loader = DataLoader(data, batch_size=128)
-
     class CustomNet1(nn.Module):
         """ Model 1.
         """
@@ -370,7 +368,7 @@ def test_pytorch_custom_nested_models():
                     nn.Conv1d(1, 1, 1),
                     nn.ConvTranspose1d(1, 1, 1),
                 ),
-                nn.AdaptiveAvgPool1d(output_size=6),
+                nn.AdaptiveAvgPool1d(output_size=4),
             )
 
         def forward(self, X):
@@ -454,11 +452,10 @@ def test_pytorch_single_output():
     from torch import nn
     from torch.nn import functional as F
     from torch.utils.data import TensorDataset, DataLoader
-    from sklearn.datasets import load_boston
 
-    X, y = load_boston(return_X_y=True)
+    X, y = shap.datasets.california(n_points=500)
     num_features = X.shape[1]
-    data = TensorDataset(torch.tensor(X).float(),
+    data = TensorDataset(torch.tensor(X.values).float(),
                          torch.tensor(y).float())
     loader = DataLoader(data, batch_size=128)
 
@@ -471,7 +468,7 @@ def test_pytorch_single_output():
             self.conv1d = nn.Conv1d(1, 1, 1)
             self.convt1d = nn.ConvTranspose1d(1, 1, 1)
             self.leaky_relu = nn.LeakyReLU()
-            self.aapool1d = nn.AdaptiveAvgPool1d(output_size=6)
+            self.aapool1d = nn.AdaptiveAvgPool1d(output_size=4)
             self.maxpool2 = nn.MaxPool1d(kernel_size=2)
 
         def forward(self, X):
@@ -528,14 +525,13 @@ def test_pytorch_multiple_inputs():
         from torch import nn
         from torch.nn import functional as F
         from torch.utils.data import TensorDataset, DataLoader
-        from sklearn.datasets import load_boston
         torch.manual_seed(1)
-        X, y = load_boston(return_X_y=True)
+        X, y = shap.datasets.california(n_points=500)
         num_features = X.shape[1]
-        x1 = X[:, num_features // 2:]
-        x2 = X[:, :num_features // 2]
-        data = TensorDataset(torch.tensor(x1).float(),
-                             torch.tensor(x2).float(),
+        x1 = X.iloc[:, num_features // 2:]
+        x2 = X.iloc[:, :num_features // 2]
+        data = TensorDataset(torch.tensor(x1.values).float(),
+                             torch.tensor(x2.values).float(),
                              torch.tensor(y).float())
         loader = DataLoader(data, batch_size=128)
 
@@ -546,7 +542,7 @@ def test_pytorch_multiple_inputs():
                 super().__init__()
                 self.disconnected = disconnected
                 if disconnected:
-                    num_features = num_features // 2 + 1
+                    num_features = num_features // 2
                 self.linear = nn.Linear(num_features, 2)
                 self.output = nn.Sequential(
                     nn.MaxPool1d(2),

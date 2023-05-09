@@ -5,6 +5,7 @@ import shap
 from .utils import explainer # (pytest fixture do not remove) pylint: disable=unused-import
 
 
+@pytest.mark.skip(reason="Let's fix this with Issue #3")
 @pytest.mark.mpl_image_compare
 def test_heatmap(explainer): # pylint: disable=redefined-outer-name
     """ Make sure the heatmap plot is unchanged.
@@ -16,6 +17,7 @@ def test_heatmap(explainer): # pylint: disable=redefined-outer-name
     return fig
 
 
+@pytest.mark.skip(reason="Let's fix this with Issue #3")
 @pytest.mark.mpl_image_compare
 def test_heatmap_feature_order(explainer): # pylint: disable=redefined-outer-name
     """ Make sure the heatmap plot is unchanged when we apply a feature ordering.

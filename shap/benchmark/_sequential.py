@@ -128,13 +128,13 @@ class SequentialPerturbation():
             self.masked_model = MaskedModel(self.model, self.masker, links.identity, self.linearize_link, *args)
 
             masks = []
-            
-            mask = np.ones(feature_size, dtype=np.bool) * (self.perturbation == "remove")
+
+            mask = np.ones(feature_size, dtype=bool) * (self.perturbation == "remove")
             masks.append(mask.copy())
 
             ordered_inds = self.sort_order_map(sample_attributions)
             increment = max(1,int(feature_size*percent))
-            for j in range(0, feature_size, increment): 
+            for j in range(0, feature_size, increment):
                 oind_list = [ordered_inds[l] for l in range(j, min(feature_size, j+increment))]
 
                 for oind in oind_list:
@@ -241,7 +241,7 @@ class SequentialPerturbation():
                 else: 
                     mask_shape = feature_size 
 
-                mask = np.ones(mask_shape, dtype=np.bool) * (self.perturbation == "remove")
+                mask = np.ones(mask_shape, dtype=bool) * (self.perturbation == "remove")
                 masks = [mask.copy()]
 
                 values = np.zeros(feature_size+1)
