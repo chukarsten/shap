@@ -1,0 +1,116 @@
+[project]
+name = "shap"
+readme = "README.md"
+description = "A unified approach to explain the output of any machine learning model."
+dynamic = ["version"]
+classifiers = [
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10"
+]
+authors = [
+    {name="Scott Lundberg", email="slund1@cs.washington.edu"}
+]
+maintainers = [
+    {name="Alteryx, Inc.", email="open_source_support@alteryx.com"}
+]
+keywords = ["data science", "machine learning", "optimization", "automl"]
+license = {file = "LICENSE"}
+requires-python = ">=3.7,<3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "scikit-learn" ,
+    "tqdm > 4.25.0",
+    "packaging > 20.9",
+    "slicer == 0.0.7",
+    "numba",
+    "cloudpickle"
+]
+
+[project.urls]
+"Documentation" = "https://shap.readthedocs.io/"
+"Source Code"= "http://github.com/slundberg/shap"
+"Changes" = "https://github.com/slundberg/shap/releases"
+"Issue Tracker" = "https://github.com/slundberg/shap/issues"
+
+[project.optional-dependencies]
+test = [
+    "pytest == 7.1.2",
+    "pytest-xdist == 2.1.0",
+    "pytest-cov == 2.10.1",
+    "pytest-mpl"
+]
+dev = [
+    "ruff == 0.0.228",
+    "darglint == 1.8.0",
+    "pre-commit >= 2.20.0",
+]
+docs = [
+    "matplotlib",
+    "ipython",
+    "numpydoc",
+    "sphinx_rtd_theme",
+    "Sphinx >= 4.5.0",
+    "nbsphinx >= 0.8.5, < 0.9.0",
+]
+
+[tool.setuptools]
+include-package-data = true
+license-files = ["LICENSE"]
+
+[tool.setuptools.packages.find]
+namespaces = true
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.txt",
+    "README.md",
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+    "* __pycache__",
+    "*.py[co]",
+    "docs/*"
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "shap.__version__"}
+
+
+[tool.coverage.run]
+source = ["shap"]
+
+[tool.coverage.report]
+exclude_lines =[
+    "pragma: no cover",
+    "raise AssertionError",
+    "if __name__ == .__main__.:",
+    "if profile:",
+    "pytest.skip"
+]
+
+[build-system]
+requires = [
+    "setuptools >= 61.0.0",
+    "wheel",
+    "numpy",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "shap/tests/*"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+junit_duration_report = "call"
